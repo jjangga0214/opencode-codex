@@ -1,5 +1,7 @@
 /** @jsxImportSource @opentui/solid */
 import type { TuiPlugin } from '@opencode-ai/plugin/tui';
+import * as accounts from '../accounts/index.js';
+import * as selection from '../accounts/selection.js';
 import { showAccounts } from './dialog.js';
 import { PromptStatus } from './prompt.js';
 import { initializeQuotaPlans, showQuotaPlans } from './quota-plan.js';
@@ -8,12 +10,18 @@ import { Sidebar } from './sidebar.js';
 
 export const tui: TuiPlugin = async (api) => {
   initializeQuotaPlans(api);
+  await accounts.load();
+  await selection.load();
 
   api.slots.register({
     order: 250,
     slots: {
-      session_prompt_right: () => <PromptStatus api={api} />,
-      sidebar_content: () => <Sidebar api={api} />,
+      session_prompt_right: (_, { session_id }) => (
+        <PromptStatus api={api} sessionID={session_id} />
+      ),
+      sidebar_content: (_, { session_id }) => (
+        <Sidebar api={api} sessionID={session_id} />
+      ),
     },
   });
 
@@ -26,7 +34,14 @@ export const tui: TuiPlugin = async (api) => {
         category: 'Codex',
         slashName: 'accounts',
         run() {
-          showAccounts(api);
+          const route = api.route.current;
+          const params = 'params' in route ? route.params : undefined;
+          const sessionID = (params as { sessionID?: unknown } | undefined)
+            ?.sessionID;
+          showAccounts(
+            api,
+            typeof sessionID === 'string' ? sessionID : undefined,
+          );
         },
       },
       {
