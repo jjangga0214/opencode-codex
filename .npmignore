@@ -1,6 +1,7 @@
 # Source and build inputs
 src/
 build.mjs
+scripts/
 tsconfig.json
 bunfig.toml
 *.tgz

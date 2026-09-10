@@ -2,6 +2,10 @@
 import type { TuiPlugin } from '@opencode-ai/plugin/tui';
 import * as accounts from '../accounts/index.js';
 import * as selection from '../accounts/selection.js';
+import {
+  ACCOUNTS_SLASH_NAME,
+  QUOTA_SLASH_NAME,
+} from './commands.js';
 import { showAccounts } from './dialog.js';
 import { PromptStatus } from './prompt.js';
 import { initializeQuotaPlans, showQuotaPlans } from './quota-plan.js';
@@ -32,7 +36,7 @@ export const tui: TuiPlugin = async (api) => {
         name: 'codex.accounts.switch',
         title: 'Switch Codex account',
         category: 'Codex',
-        slashName: 'accounts',
+        slashName: ACCOUNTS_SLASH_NAME,
         run() {
           const route = api.route.current;
           const params = 'params' in route ? route.params : undefined;
@@ -49,7 +53,7 @@ export const tui: TuiPlugin = async (api) => {
         name: 'codex.quota.plan',
         title: 'Configure Codex quota',
         category: 'Codex',
-        slashName: 'codex-quota',
+        slashName: QUOTA_SLASH_NAME,
         run() {
           showQuotaPlans(api);
         },

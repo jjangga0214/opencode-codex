@@ -1,20 +1,22 @@
-name: Publish
+name: CI
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
 
 concurrency:
-  group: npm-publish-${{ github.ref }}
-  cancel-in-progress: false
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
-  publish:
+  verify:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     steps:
       - uses: actions/checkout@v6
 
@@ -29,25 +31,11 @@ jobs:
           node-version: 26.4
           registry-url: https://registry.npmjs.org
 
-      - name: 버전 설정
-        run: |
-          VERSION=${GITHUB_REF_NAME#v}
-          npm version "$VERSION" --no-git-tag-version
-
       - name: 패키지 설치
         run: bun install --frozen-lockfile
-
-      - name: 릴리스 메타데이터 검사
-        run: bun run release:check
 
       - name: 타입·빌드·테스트 검사
         run: bun run verify
 
-      - name: 패키지 내용 검사
-        run: npm pack --dry-run
-
       - name: 패키지 설치 스모크 테스트
         run: bun run package:smoke
-
-      - name: NPM에 배포
-        run: npm publish --provenance --access public

@@ -19,8 +19,10 @@ flows instead of bespoke CLIs or custom dialogs.
 - **Multi-account OAuth.** Log in once per account through the standard
   `opencode auth login` → `openai` flow (browser / device code / paste
   callback URL). Each login adds another account.
-- **Account switching inside the TUI.** `/accounts` opens a picker showing
-  every connected account, its plan, and current 5h/weekly usage.
+- **Account switching inside the TUI.** `/codex-accounts` opens a picker
+  showing every connected account, its plan, and current 5h/weekly usage.
+- **Session-aware selection.** Apply an account to all sessions, only the
+  current session plus future sessions, or only the current session.
 - **Standard logout flow.** Removing accounts is just
   `opencode auth logout` — each account appears as its own entry.
 - **Automatic fallback.** Requests go through the active account; if it hits
@@ -32,12 +34,28 @@ flows instead of bespoke CLIs or custom dialogs.
 
 ## Installation
 
-Before installing, it's recommended to log out of every Codex account
-currently signed in to **OpenCode**.
+The npm package name is intentionally undecided in this pre-release fork.
+Replace `<npm-package-name>` after choosing it, then register the same package
+in both OpenCode plugin entry points:
 
-```sh
-opencode plugin add @insd47/opencode-codex
+```jsonc
+// ~/.config/opencode/opencode.json
+{
+  "plugin": ["<npm-package-name>@<version>"]
+}
 ```
+
+```jsonc
+// ~/.config/opencode/tui.json
+{
+  "plugin": ["<npm-package-name>@<version>"]
+}
+```
+
+Use only one OpenCode configuration directory. Registering the plugin in both
+`~/.config/opencode` and `~/.opencode` initializes two plugin instances and can
+make the selected account disagree with the TUI. The fork is currently tested
+with OpenCode 1.18.30.
 
 ## Adding accounts
 
@@ -61,14 +79,26 @@ account. Repeat for additional accounts.
 |--------|--------------------------------|
 | Add    | `opencode auth login` → openai |
 | List   | `opencode auth list`           |
-| Switch | `/accounts` in the TUI         |
+| Switch | `/codex-accounts` in the TUI   |
 | Remove | `opencode auth logout`         |
 
 Under the hood the plugin keeps a `openai/<email>` entry in `auth.json` per
 connected account and keeps the canonical `openai` key as a compatibility
 mirror — so OpenCode's provider system sees a normal OAuth credential while the
-plugin reads the account pool from OpenCode's standard auth store. Account
-switching inside an open TUI process is kept in memory and is not persisted.
+plugin reads the account pool from OpenCode's standard auth store.
+
+After choosing an account, select where it applies:
+
+- **All sessions** changes every known session and the default for new sessions.
+- **This session + new sessions** changes the current session and the default,
+  while leaving other existing sessions pinned to their current accounts.
+- **This session only** changes only the current session.
+
+Selections are persisted and watched across OpenCode processes. New sessions
+therefore start with the most recently selected default account, while an
+explicitly pinned existing session keeps its selection.
+
+![Account selection scopes](https://raw.githubusercontent.com/jjangga0214/opencode-codex/main/docs/screenshots/codex-account-scope.png)
 
 ## Quota display
 
@@ -84,7 +114,10 @@ When only one account is connected, just **Quota** is shown.
 Usage data is fetched in memory from `chatgpt.com/backend-api/wham/usage`:
 
 - once on TUI startup,
-- on every `session.idle` event (debounced),
+- immediately after an account switch,
+- when a new session is created,
+- when a user sends a new message,
+- when an AI response finishes (`session.idle`),
 - and every 5 minutes thereafter.
 
 `All Quota` weights each account by its effective plan capacity. Plus uses 1x
@@ -95,32 +128,38 @@ and Pro uses 5x by default. The usage API may report both Pro tiers only as
 2. Choose the Pro account by email.
 3. Choose **Pro 5x** or **Pro 20x**.
 
+![Codex quota command](https://raw.githubusercontent.com/jjangga0214/opencode-codex/main/docs/screenshots/codex-quota-command.png)
+
+![Pro quota capacity](https://raw.githubusercontent.com/jjangga0214/opencode-codex/main/docs/screenshots/codex-quota-capacity.png)
+
 The choice is saved in OpenCode's plugin storage and applied immediately. A Pro
 5x selection clears the override and restores the default; only Pro 20x accounts
 need an override. The account picker and prompt status show `Pro 5x` or
 `Pro 20x` so you can confirm the effective setting. The 5-hour and weekly rows
 are weighted independently, and accounts without fetched usage remain excluded.
 
-## Storage
+## Storage and runtime state
 
-| Path                                          | Purpose                                                                                                                                                                 |
-|-----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `$XDG_DATA_HOME/opencode/auth.json`           | OpenCode's credential file and the source of truth for Codex OAuth tokens. One entry per account at `openai/<email>` plus the compatibility mirror at `openai`.         |
+| Location | Purpose |
+|----------|---------|
+| `$XDG_DATA_HOME/opencode/auth.json` | OpenCode's credential file and the source of truth for Codex OAuth tokens. One entry per account at `openai/<email>` plus the compatibility mirror at `openai`. |
+| `$XDG_DATA_HOME/opencode/codex/selection.json` | Default and per-session account selections. |
+| OpenCode plugin KV storage | Per-account Pro 5x/20x overrides. |
 
-Quota, temporary rate-limit state, and the TUI account selection are process
-memory only. They are refreshed again after restarting OpenCode.
+Fetched usage and temporary rate-limit state stay in process memory and are
+refreshed after restarting OpenCode.
 
 ## Troubleshooting
 
-**`/accounts` says "No accounts" right after install.**
+**`/codex-accounts` says "No accounts" right after install.**
 Make sure you've logged in at least once with `opencode auth login` → openai.
 If you migrated from another multi-account plugin, your previous tokens won't
 auto-import — log in again.
 
 **Logging out via `opencode auth logout` and then chatting fails.**
-Pick a different account with `/accounts`, or run `opencode auth login` again.
-The plugin only restores the active mirror when there's at least one account
-left.
+Pick a different account with `/codex-accounts`, or run `opencode auth login`
+again. The plugin only restores the active mirror when there's at least one
+account left.
 
 **Sidebar shows `5h —` or `weekly —`.**
 Usage data hasn't been fetched yet. It populates on the next idle event or 5
@@ -130,3 +169,7 @@ re-authenticate.
 ## License
 
 [MIT](./LICENSE)
+
+This fork retains the original project's MIT license and attribution. Fork
+changes are maintained at
+[jjangga0214/opencode-codex](https://github.com/jjangga0214/opencode-codex).

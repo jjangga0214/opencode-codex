@@ -1,13 +1,27 @@
 {
   "name": "@insd47/opencode-codex",
   "version": "0.0.0",
+  "private": true,
   "description": "OpenCode plugin for ChatGPT Plus/Pro OAuth with clean multi-account management",
   "license": "MIT",
-  "author": "insd47",
+  "author": "jjangga0214",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "codex",
+    "chatgpt",
+    "oauth",
+    "multi-account"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/insd47/opencode-codex"
+    "url": "git+https://github.com/jjangga0214/opencode-codex.git"
   },
+  "homepage": "https://github.com/jjangga0214/opencode-codex#readme",
+  "bugs": {
+    "url": "https://github.com/jjangga0214/opencode-codex/issues"
+  },
+  "packageManager": "bun@1.4.0",
   "type": "module",
   "main": "dist/server.js",
   "publishConfig": {
@@ -18,26 +32,34 @@
     ".": "./dist/server.js",
     "./tui": "./dist/tui.js"
   },
-  "files": ["dist", "README.md", "LICENSE"],
+  "files": ["dist", "README.md", "CHANGELOG.md", "LICENSE"],
   "scripts": {
     "build": "node build.mjs",
-    "test": "npm run build && node --test test/*.test.mjs",
-    "typecheck": "tsc --noEmit"
+    "test": "node --test test/*.test.mjs",
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run typecheck && npm run build && npm test",
+    "package:smoke": "node scripts/smoke-package.mjs",
+    "release:check": "node scripts/check-release.mjs",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run release:check && npm run verify"
   },
   "engines": {
     "node": ">=18"
   },
   "peerDependencies": {
-    "@opencode-ai/plugin": "*",
-    "@opencode-ai/sdk": "*"
+    "@opencode-ai/plugin": ">=1.15.7 <2",
+    "@opencode-ai/sdk": ">=1.15.7 <2",
+    "@opentui/core": ">=0.2.15 <1",
+    "@opentui/solid": ">=0.2.15 <1",
+    "solid-js": "1.9.12"
   },
   "devDependencies": {
-    "@opencode-ai/plugin": "*",
-    "@opencode-ai/sdk": "*",
-    "@opentui/core": "*",
-    "@opentui/solid": "*",
+    "@opencode-ai/plugin": "1.18.30",
+    "@opencode-ai/sdk": "1.18.30",
+    "@opentui/core": "0.5.10",
+    "@opentui/solid": "0.5.10",
     "@types/node": "^25.9.1",
-    "solid-js": "*",
+    "solid-js": "1.9.12",
     "typescript": "^5.4.0"
   }
 }
