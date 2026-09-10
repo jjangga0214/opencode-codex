@@ -7,7 +7,8 @@ the package name is chosen.
 
 1. Choose an available npm package name.
 2. Set that name in `package.json` and remove `private: true`.
-3. Replace every `<npm-package-name>` placeholder in `README.md`.
+3. Replace the `<npm-package-name>` and `<version>` placeholders in
+   `README.md`.
 4. Run `npm run release:check` and `npm run verify`.
 5. Inspect the package with `npm pack --dry-run`, then run
    `npm run package:smoke`. The smoke test packs and installs the tarball in a

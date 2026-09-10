@@ -13,8 +13,10 @@ if (!packageJson.name || packageJson.name === '@insd47/opencode-codex') {
 if (!packageJson.version || packageJson.version === '0.0.0') {
   errors.push('set a release version (the tag workflow does this automatically)');
 }
-if (readme.includes('<npm-package-name>')) {
-  errors.push('replace <npm-package-name> in README.md');
+for (const placeholder of ['<npm-package-name>', '<version>']) {
+  if (readme.includes(placeholder)) {
+    errors.push(`replace ${placeholder} in README.md`);
+  }
 }
 
 if (errors.length > 0) {
