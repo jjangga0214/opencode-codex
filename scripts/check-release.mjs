@@ -7,8 +7,8 @@ const errors = [];
 if (packageJson.private === true) {
   errors.push('remove `private: true` after choosing the npm package name');
 }
-if (!packageJson.name || packageJson.name === '@insd47/opencode-codex') {
-  errors.push('choose the npm package name');
+if (packageJson.name !== '@jjangga0214/opencode-codex') {
+  errors.push('set the npm package name to @jjangga0214/opencode-codex');
 }
 if (!packageJson.version || packageJson.version === '0.0.0') {
   errors.push('set a release version (the tag workflow does this automatically)');

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0 - 2026-09-12
+
 ### Added
 
 - Capacity-weighted pooled quota with configurable Pro 5x and Pro 20x tiers.

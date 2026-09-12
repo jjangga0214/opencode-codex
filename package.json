@@ -1,7 +1,6 @@
 {
-  "name": "@insd47/opencode-codex",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@jjangga0214/opencode-codex",
+  "version": "2.0.0",
   "description": "OpenCode plugin for ChatGPT Plus/Pro OAuth with clean multi-account management",
   "license": "MIT",
   "author": "jjangga0214",

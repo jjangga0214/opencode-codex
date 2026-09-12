@@ -34,21 +34,19 @@ flows instead of bespoke CLIs or custom dialogs.
 
 ## Installation
 
-The npm package name is intentionally undecided in this pre-release fork.
-Replace `<npm-package-name>` after choosing it, then register the same package
-in both OpenCode plugin entry points:
+Register the package in both OpenCode plugin entry points:
 
 ```jsonc
 // ~/.config/opencode/opencode.json
 {
-  "plugin": ["<npm-package-name>@<version>"]
+  "plugin": ["@jjangga0214/opencode-codex@2.0.0"]
 }
 ```
 
 ```jsonc
 // ~/.config/opencode/tui.json
 {
-  "plugin": ["<npm-package-name>@<version>"]
+  "plugin": ["@jjangga0214/opencode-codex@2.0.0"]
 }
 ```
 

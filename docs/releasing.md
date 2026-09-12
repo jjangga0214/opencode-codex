@@ -1,16 +1,14 @@
 # Releasing the fork
 
-The repository is intentionally protected from accidental npm publishing until
-the package name is chosen.
+The npm package is `@jjangga0214/opencode-codex`. The initial prepared release
+is `2.0.0`.
 
 ## One-time package setup
 
-1. Choose an available npm package name.
-2. Set that name in `package.json` and remove `private: true`.
-3. Replace the `<npm-package-name>` and `<version>` placeholders in
-   `README.md`.
-4. Run `npm run release:check` and `npm run verify`.
-5. Inspect the package with `npm pack --dry-run`, then run
+1. Authenticate to npm with the `jjangga0214` account and confirm that it owns
+   the `@jjangga0214` scope.
+2. Run `npm run release:check` and `npm run verify`.
+3. Inspect the package with `npm pack --dry-run`, then run
    `npm run package:smoke`. The smoke test packs and installs the tarball in a
    temporary directory and initializes both the server and TUI entry points.
 
@@ -23,7 +21,7 @@ npm publish --access public
 
 After the package exists, configure npm Trusted Publishing for the GitHub
 repository `jjangga0214/opencode-codex` and workflow `publish.yml`. Later
-releases are created by pushing a SemVer tag such as `v1.2.1`; the workflow
+releases are created by pushing a SemVer tag such as `v2.0.1`; the workflow
 sets the package version from the tag, validates, tests, packs, and publishes
 with provenance.
 
